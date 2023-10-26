@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            background-color: #f4f4f4;
+            display: block;
+            margin: 0 auto;
+
+            width: 100%;
+        }
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            line-height: 50px;
+            position: absolute;
+            bottom: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+            display: none; /* Initially set to not display */
+        }
+
+        #left-btn {
+            left: 20px;
+        }
+
+        #right-btn {
+            right: 20px;
+        }
+
+        @media only screen and (max-width: 768px) {
+            .control-btn {
+                display: block;
+            }
+        
+        }
+        @media only screen and (min-width: 769px) {
+            canvas {
+                max-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Пинг Понг</h1>
+    <canvas id="pingPongCanvas" ></canvas>
+    <div id="left-btn" class="control-btn">←</div>
+    <div id="right-btn" class="control-btn">→</div>
+    <script>
+        const canvas = document.getElementById('pingPongCanvas');
+        const ctx = canvas.getContext('2d');
+
+ 
+
+
+   
+        // Подсчет очков
+        const game = {
+            score: 2
+        } 
+
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speed: 4,
+            dx: 4,
+            dy: -4,
+            color: 'blue'
+        };
+
+        const paddleWidth = 60;
+        const paddleHeight = 10;
+        const paddle = {
+            x: (canvas.width - paddleWidth) / 2,
+            y: canvas.height - paddleHeight - 10,
+            width: paddleWidth,
+            height: paddleHeight,
+            dx: 8,
+            color: 'red'
+        };
+        console.log(paddle.y)
+        let rightPressed = false;
+        let leftPressed = false;
+
+        resizeCanvas()
+        window.addEventListener("load", resizeCanvas);
+        window.addEventListener("resize", resizeCanvas);
+
+        function resizeCanvas() {
+            const canvas = document.getElementById("pingPongCanvas");
+
+            // For mobile screens
+            if (window.innerWidth <= 768) { 
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight * 0.7; // Use 70% of the viewport height for the canvas
+
+                paddle.x =  (canvas.width - paddleWidth) / 2;
+                paddle.y =   canvas.height - paddleHeight - 10;
+                console.log(paddle.y)
+                console.log(canvas.height)
+            } 
+            else {
+                // For larger screens (like PCs)
+                canvas.width = 800; // Set to your desired default width for larger screens
+                canvas.height = 400; // Set to your desired default height for larger screens
+                paddle.x =  (canvas.width - paddleWidth) / 2;
+                paddle.y =   canvas.height - paddleHeight - 10;
+            }
+        }
+
+        const leftButton = document.getElementById("left-btn");
+        const rightButton = document.getElementById("right-btn");
+
+        leftButton.addEventListener('touchstart', function() {
+            leftPressed = true;
+        });
+
+        leftButton.addEventListener('touchend', function() {
+            leftPressed = false;
+        });
+
+        rightButton.addEventListener('touchstart', function() {
+            rightPressed = true;
+        });
+
+        rightButton.addEventListener('touchend', function() {
+            rightPressed = false;
+        });        
+
+
+        function drawBall() {
+            // Устанавливаем цвет заливки мяча
+            ctx.fillStyle = ball.color;
+            // Начинаем путь
+            ctx.beginPath();
+            // Рисуем круг (шар)
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false); // Draw the circle (ball)
+            // Заполняем круг
+            ctx.fill();
+        }
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+        }
+        function moveBall() {
+
+
+            // Двигаем мяч
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Меняем направление если мяч коснулся стенки слева или справа
+            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width){
+                ball.dx = -ball.dx;
+            }
+
+
+            // Меняем направление если мяч коснулся верха или низа
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height){
+                ball.dy = -ball.dy;
+                no_padding = true;
+            }
+
+            if (ball.y + ball.radius > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.width ) {
+                ball.y = paddle.y - 20;
+                ball.dy = -ball.dy;
+                success();
+                // ball.dx += getRandomInt(-2, 2)
+                // ball.dy += getRandomInt(-2, 2)
+            }
+            if (ball.y + ball.radius > canvas.height) {
+                //alert('Game Over');
+                miss();
+            }
+
+        }
+
+        function drawBall() {
+            ctx.fillStyle = ball.color;
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false);
+            ctx.fill();
+        }
+
+        function drawPaddle() {
+            ctx.fillStyle = paddle.color;
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        }
+    
+
+
+        function movePaddle() {
+            if (rightPressed == true && paddle.x < canvas.width - paddle.width) {
+                paddle.x += paddle.dx;
+            }
+            if (leftPressed == true && paddle.x > 0) {
+                paddle.x -= paddle.dx;
+            }
+        }
+
+
+        function success()
+        {
+            game.score += 1;
+            // ball.speed += 1;
+            // ball.dx = ball.dx > 0 ? ball.speed : -ball.speed;
+            // ball.dy = ball.dy > 0 ? ball.speed : -ball.speed;
+            // paddle.dx += 1;
+            console.log([ball.speed, ball.dx, ball.dy])
+        }
+
+        function miss()
+        {
+            game.score -= 1;
+            if(game.score < 0){
+                draw_score(0)
+                finish();
+            }
+        }
+
+        function draw_score(score)
+        {
+            ctx.font = "bold 30px Verdana";
+            ctx.fillStyle = "#ff0000";
+            ctx.textAlign = "right";
+            ctx.fillText(score, canvas.width - 20, 40);
+        }
+        
+        function finish()
+        {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+
+            alert("GAME OVER");
+            document.location.reload();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if ( e.key === 'ArrowRight') {
+                rightPressed = true;
+            }
+            if (e.key === 'ArrowLeft') {
+                leftPressed = true;
+            }
+        });
+
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'ArrowRight') {
+                rightPressed = false;
+            }
+            if (e.key === 'ArrowLeft') {
+                leftPressed = false;
+            }
+        });
+
+        function start() {
+            // Очищаем холст
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Рисуем мяч
+            drawBall();
+
+            // Рисуем ракетку
+            drawPaddle();
+
+            // Движение мяча
+            moveBall();
+
+            // Движение мяча
+            movePaddle();
+     
+            draw_score(game.score);
+            // Функция для цикла анимации
+            requestAnimationFrame(start);
+        }
+
+        start();
+        //draw_score(22)
+
+
+        // setInterval(function(){
+        //     ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //     moveBall()
+        //     drawBall();
+        //     drawPaddle()
+        //     movePaddle()
+        // }, 20);
+
+
+    </script>
+</body>
+</html>
+
+<!-- // Функция для перемещения весла в зависимости от нажатия клавиш со стрелками
+         функция movePaddle() {
+             if (rightPressed && Paddle.x < Canvas.width - Paddle.width) { // Если нажата стрелка вправо и весло находится внутри холста
+                 весло.x += весло.dx; // Перемещаем весло вправо
+             }
+             if (leftPressed && Paddle.x > 0) { // Если нажата стрелка влево и ракетка находится внутри холста
+                 весло.x -= весло.dx; // Перемещаем весло влево
+             }
+         }
+
+         // Флаги для проверки нажатия клавиш со стрелками
+         пусть rightPressed = ложь;
+         пусть leftPressed = ложь;
+
+         // Прослушиватель событий нажатия клавиши (при нажатии клавиши)
+         document.addEventListener('keydown', function(e) {
+             if ( e.key === 'ArrowRight') { // Клавиша со стрелкой вправо
+                 rightPressed = правда;
+             }
+             if (e.key === 'ArrowLeft') { // Клавиша со стрелкой влево
+                 leftPressed = правда;
+             }
+         });
+
+         // Прослушиватель событий нажатия клавиши (когда клавиша отпущена)
+         document.addEventListener('keyup', function(e) {
+             if (e.key === 'ArrowRight') { // Клавиша со стрелкой вправо
+                 rightPressed = ложь;
+             }
+             if (e.key === 'ArrowLeft') { // Клавиша со стрелкой влево
+                 leftPressed = ложь;
+             }
+         });
+
+         // Функция для перемещения мяча и обработки столкновений
+         функция moveBall() {
+             мяч.x += мяч.dx; // Перемещаем мяч горизонтально
+             мяч.у += мяч.ди; // Перемещаем мяч вертикально
+
+             // Проверка столкновения мяча сверху и снизу (включая ракетку)
+             if (ball.y - ball.radius < 0 || (ball.y + ball.radius > Paddle.y && ball.x > Paddle.x && ball.x < Paddle.x + Paddle.width)) {
+                 ball.dy = -ball.dy; // Обратное вертикальное направление
+             }
+
+             // Проверяем столкновение мяча с краями холста
+             if (ball.x - ball.radius < 0 || ball.x + ball.radius > Canvas.width) {
+                 мяч.dx = -ball.dx; // Обратное горизонтальное направление
+             }
+
+             // Если мяч вышел за нижнюю границу
+             if (ball.y + ball.radius > Canvas.height) {
+                 // Игра окончена (перезагрузите страницу для перезапуска)
+                 документ.местоположение.перезагрузка();
+             }
+         }
+
+         // Основная функция рисования
+         функция рисования() {
+             ctx.clearRect(0, 0, холст.ширина, холст.высота); // Очищаем холст
+             нарисовать мяч(); // Рисуем мяч
+             рисоватьПаддл(); // Рисуем весло
+             перемещениеШар(); // Перемещаем мяч
+             перемещениеПаддл(); // Перемещаем весло
+             requestAnimationFrame (рисовать); // Запрос на повторный вызов функции рисования для следующего кадра
+         }
+
+         рисовать(); // Вызов основной функции рисования -->
