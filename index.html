@@ -20,7 +20,7 @@
             background-color: #333;
             color: #fff;
             text-align: center;
-            line-height: 100px; /* Adjusted this value to be equal to the height */
+            line-height: 100px; /* Изменено это значение так, чтобы оно было равно высоте */
             position: absolute;
             margin-top: 30px;
             font-size: 46px;
@@ -110,7 +110,7 @@
             // For mobile screens
             if (window.innerWidth <= 768) { 
                 canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight * 0.7; // Use 70% of the viewport height for the canvas
+                canvas.height = window.innerHeight * 0.7; // Использую 70 % высоты области просмотра для холста
 
                 paddle.x =  (canvas.width - paddleWidth) / 2;
                 paddle.y =   canvas.height - paddleHeight - 10;
@@ -118,9 +118,9 @@
                 console.log(canvas.height)
             } 
             else {
-                // For larger screens (like PCs)
-                canvas.width = 800; // Set to your desired default width for larger screens
-                canvas.height = 400; // Set to your desired default height for larger screens
+                // Для больших экранов
+                canvas.width = 800;
+                canvas.height = 400;
                 paddle.x =  (canvas.width - paddleWidth) / 2;
                 paddle.y =   canvas.height - paddleHeight - 10;
             }
@@ -152,15 +152,11 @@
             // Начинаем путь
             ctx.beginPath();
             // Рисуем круг (шар)
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false); // Draw the circle (ball)
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false);
             // Заполняем круг
             ctx.fill();
         }
-        function getRandomInt(min, max) {
-            min = Math.ceil(min);
-            max = Math.floor(max);
-            return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-        }
+
         function moveBall() {
 
 
@@ -184,8 +180,6 @@
                 ball.y = paddle.y - 20;
                 ball.dy = -ball.dy;
                 success();
-                // ball.dx += getRandomInt(-2, 2)
-                // ball.dy += getRandomInt(-2, 2)
             }
             if (ball.y + ball.radius > canvas.height) {
                 //alert('Game Over');
@@ -310,7 +304,7 @@
 </body>
 </html>
 
-<!-- // Функция для перемещения весла в зависимости от нажатия клавиш со стрелками
+<!-- // Функция для перемещения ракетки в зависимости от нажатия клавиш со стрелками
          функция movePaddle() {
              if (rightPressed && Paddle.x < Canvas.width - Paddle.width) { // Если нажата стрелка вправо и весло находится внутри холста
                  весло.x += весло.dx; // Перемещаем весло вправо
